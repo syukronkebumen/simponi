@@ -1,0 +1,19 @@
+{
+  "name": "monitoringserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "moment-timezone": "^0.5.46",
+    "pm2": "^5.4.3"
+  }
+}

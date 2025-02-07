@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM2 Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>PM2 Dashboard by NEWUS TECHNOLOGY</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Uptime</th>
+                <th>Restart</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% processList.forEach(process => { %>
+                <tr>
+                    <td><%= process.name %></td>
+                    <td><%= process.pm2_env.status %></td>
+                    <td><%= process.formatted_uptime %></td>
+                    <td>
+                        <% if (process.pm2_env.status === 'online') { %>
+                            <form action="/restart/<%= process.pm_id %>" method="POST" style="display:inline;">
+                                <button type="submit">Restart</button>
+                            </form>
+                          	<form action="/stop/<%= process.pm_id %>" method="POST" style="display:inline;">
+                                <button type="submit" style="background-color: red; color: white;">Stop</button>
+                            </form>
+                        <% } else { %>
+                            <form action="/restart/<%= process.pm_id %>" method="POST" style="display:inline;">
+                                <button type="submit">Restart</button>
+                            </form>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>
