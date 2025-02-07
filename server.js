@@ -19,15 +19,15 @@ app.get('/', async (req, res) => {
             console.error("Error fetching PM2 list:", err || stderr);
             return res.status(500).send('Error fetching PM2 process list');
         }
-        // const processList = JSON.parse(stdout).map(proc => {
-        //     const uptime = proc.pm2_env.pm_uptime
-        //         ? moment(proc.pm2_env.pm_uptime).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
-        //         : 'N/A';
-        //     return {
-        //         ...proc,
-        //         formatted_uptime: uptime
-        //     };
-        // });
+        const processList = JSON.parse(stdout).map(proc => {
+            const uptime = proc.pm2_env.pm_uptime
+                ? moment(proc.pm2_env.pm_uptime).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
+                : 'N/A';
+            return {
+                ...proc,
+                formatted_uptime: uptime
+            };
+        });
         console.log('sasas', processList)
         // res.render('index', { processList });
         res.render('index', { processList });
