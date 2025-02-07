@@ -1,6 +1,8 @@
 const express = require('express');
 const { exec } = require('child_process');
 const axios = require('axios');
+const session = require('express-session');
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3023;
@@ -11,6 +13,69 @@ app.set('view engine', 'ejs');
 
 // Serve static files
 app.use(express.static('public'));
+
+// Middleware untuk parsing request body
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Middleware untuk sesi
+app.use(
+    session({
+        secret: 'your_secret_key', // Ubah dengan key rahasia Anda
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false } // Pastikan ini secure: true jika menggunakan HTTPS
+    })
+);
+
+// User login credentials (hardcoded untuk contoh)
+const USERNAME = 'admin';
+const PASSWORD = 'password123';
+
+// Middleware untuk mengecek login
+function isAuthenticated(req, res, next) {
+    if (req.session.loggedIn) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
+// Login page
+app.get('/login', (req, res) => {
+    res.send(`
+        <form method="POST" action="/login">
+            <h2>Login</h2>
+            <label>Username:</label>
+            <input type="text" name="username" required><br>
+            <label>Password:</label>
+            <input type="password" name="password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    `);
+});
+
+// Login handler
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === USERNAME && password === PASSWORD) {
+        req.session.loggedIn = true;
+        res.redirect('/');
+    } else {
+        res.send('Invalid username or password. <a href="/login">Try again</a>');
+    }
+});
+
+// Logout handler
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Error logging out.');
+        }
+        res.redirect('/login');
+    });
+});
+
+// Tambahkan middleware untuk melindungi dashboard
+app.use(isAuthenticated);
 
 // Get PM2 process list
 app.get('/', async (req, res) => {
@@ -28,7 +93,6 @@ app.get('/', async (req, res) => {
                 formatted_uptime: uptime
             };
         });
-        console.log('sasas', processList)
         // res.render('index', { processList });
         res.render('index', { processList });
         // res.json(dummyData);
