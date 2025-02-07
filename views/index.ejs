@@ -16,6 +16,8 @@
                 <th>Status</th>
                 <th>Uptime</th>
                 <th>Restart</th>
+                <th>Deploy</th>
+                <th>Log</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +39,14 @@
                                 <button type="submit">Restart</button>
                             </form>
                         <% } %>
+                    </td>
+                    <td>
+                        <form action="/deploy/<%= process.name %>" method="POST" style="display:inline;">
+                            <button type="submit" style="background-color: blue; color: white;">Deploy</button>
+                        </form>
+                    </td>
+                    <td>
+                        ${deployLogs[process.name] ? deployLogs[process.name] : 'No logs yet'}
                     </td>
                 </tr>
             <% }); %>

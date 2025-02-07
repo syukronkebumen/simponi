@@ -158,6 +158,41 @@ app.get('/ssl-status', async (req, res) => {
     res.render('ssl-status', { results });
 });
 
+const appConfig = {
+    "simpuskes.com" : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
+    "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
+    "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" }
+};
+
+app.post('/deploy/:appName', async (req, res) => {
+    const appName = req.params.appName;
+    const config = appConfig[appName];
+
+    if (!config) {
+        deployLogs[appName] = `Deploy Failed: App config not found`;
+        return res.redirect('/');
+    }
+
+    deployLogs[appName] = 'Deploying...';
+
+    try {
+        exec(`cd ${config.path} && git pull origin ${config.branch} && npm install && npm run build && pm2 restart ${appName}`, 
+        (error, stdout, stderr) => {
+            if (error || stderr) {
+                deployLogs[appName] = `Deploy Failed: ${error || stderr}`;
+            } else {
+                deployLogs[appName] = `Deploy Success: ${stdout}`;
+            }
+            res.redirect('/');
+        });
+
+    } catch (error) {
+        deployLogs[appName] = `Deploy Failed: ${error.message}`;
+        res.redirect('/');
+    }
+});
+
+
 // Start server
 app.listen(port, () => {
     console.log(`Dashboard is running at http://localhost:${port}`);
