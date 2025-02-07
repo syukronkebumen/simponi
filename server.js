@@ -10,7 +10,7 @@ const moment = require('moment-timezone');
 const processList = require('./dummy_data.json')
 const dataDomain    = require('./dataset/data_domain.json')
 const sslChecker = require('ssl-checker');
-
+let deployLogs = {};
 // Fungsi untuk memeriksa status SSL domain
 async function checkSSL(domain) {
     try {
@@ -102,15 +102,15 @@ app.get('/', async (req, res) => {
             console.error("Error fetching PM2 list:", err || stderr);
             return res.status(500).send('Error fetching PM2 process list');
         }
-        const processList = JSON.parse(stdout).map(proc => {
-            const uptime = proc.pm2_env.pm_uptime
-                ? moment(proc.pm2_env.pm_uptime).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
-                : 'N/A';
-            return {
-                ...proc,
-                formatted_uptime: uptime
-            };
-        });
+        // const processList = JSON.parse(stdout).map(proc => {
+        //     const uptime = proc.pm2_env.pm_uptime
+        //         ? moment(proc.pm2_env.pm_uptime).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
+        //         : 'N/A';
+        //     return {
+        //         ...proc,
+        //         formatted_uptime: uptime
+        //     };
+        // });
         // res.render('index', { processList });
         res.render('index', { processList });
         // res.json(dummyData);
