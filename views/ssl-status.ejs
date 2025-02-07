@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL Status</title>
+</head>
+<body>
+    <h1>SSL Status</h1>
+    <a href="/">back to home</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th>Valid</th>
+                <th>Valid From</th>
+                <th>Valid To</th>
+                <th>Days Remaining</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% results.forEach(result => { %>
+                <tr>
+                    <td><%= result.domain %></td>
+                    <% if (result.error) { %>
+                        <td colspan="4"><%= result.error %></td>
+                    <% } else { %>
+                        <td><%= result.valid ? 'Yes' : 'No' %></td>
+                        <td><%= result.validFrom %></td>
+                        <td><%= result.validTo %></td>
+                        <td><%= result.daysRemaining %></td>
+                    <% } %>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>

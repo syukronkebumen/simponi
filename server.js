@@ -8,6 +8,24 @@ const app = express();
 const port = 3023;
 const moment = require('moment-timezone');
 const processList = require('./dummy_data.json')
+const dataDomain    = require('./dataset/data_domain.json')
+const sslChecker = require('ssl-checker');
+
+// Fungsi untuk memeriksa status SSL domain
+async function checkSSL(domain) {
+    try {
+        const sslInfo = await sslChecker(domain, { method: "GET" });
+        return {
+            valid: sslInfo.valid,
+            validFrom: sslInfo.valid_from,
+            validTo: sslInfo.valid_to,
+            daysRemaining: sslInfo.days_remaining
+        };
+    } catch (error) {
+        console.error(`Error checking SSL for domain ${domain}:`, error);
+        return null;
+    }
+}
 // Set view engine
 app.set('view engine', 'ejs');
 
@@ -20,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Middleware untuk sesi
 app.use(
     session({
-        secret: 'your_secret_key', // Ubah dengan key rahasia Anda
+        secret: '!qAx-@wsx-#edc-$rfv', // Ubah dengan key rahasia Anda
         resave: false,
         saveUninitialized: true,
         cookie: { secure: false } // Pastikan ini secure: true jika menggunakan HTTPS
@@ -123,6 +141,22 @@ app.post('/stop/:id', (req, res) => {
     });
 });
 
+// Route untuk memeriksa status SSL
+app.get('/ssl-status', async (req, res) => {
+    const domains = dataDomain; // Ganti dengan domain Anda
+    const results = [];
+
+    for (const domain of domains.data) {
+        const status = await checkSSL(domain);
+        if (status) {
+            results.push({ domain, ...status });
+        } else {
+            results.push({ domain, error: 'Unable to check SSL' });
+        }
+    }
+    console.log(results)
+    res.render('ssl-status', { results });
+});
 
 // Start server
 app.listen(port, () => {

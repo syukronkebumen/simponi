@@ -16,6 +16,7 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "moment-timezone": "^0.5.46",
-    "pm2": "^5.4.3"
+    "pm2": "^5.4.3",
+    "ssl-checker": "^2.0.10"
   }
 }
