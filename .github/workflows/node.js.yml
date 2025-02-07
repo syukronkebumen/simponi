@@ -13,17 +13,21 @@ jobs:
   build:
 
     runs-on: self-hosted
-
     strategy:
       matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [20]
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm i
-    - run: pm2 restart monit.simpuskes.com
+        node-version: '20.x'
+    - name: Git pull
+      run: |
+          cd /home/simpuskes-monit/htdocs/monit.simpuskes.com
+          git pull
+    - run: npm install
+    - name : change repo
+      run : cd /home/simpuskes-monit/htdocs/monit.simpuskes.com/actions-runner/_work/simponi/simponi
+    - run : pm2 restart monit.simpuskes.com
+    - run : systemctl restart nginx
