@@ -157,6 +157,19 @@ app.get('/ssl-status', async (req, res) => {
     res.render('ssl-status', { results });
 });
 
+// Fungsi untuk menjalankan perintah dan menangkap output
+function executeCommand(command, cwd) {
+    return new Promise((resolve, reject) => {
+        exec(command, { cwd }, (error, stdout, stderr) => {
+            if (error) {
+                reject({ success: false, message: stderr || error.message });
+            } else {
+                resolve({ success: true, message: stdout });
+            }
+        });
+    });
+}
+
 const appConfig = {
     "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
     "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
