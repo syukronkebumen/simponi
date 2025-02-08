@@ -46,11 +46,13 @@
                         </form>
                     </td>
                     <td>
-                        <%= process.name ? process.name : 'No logs yet' %>
+                        <%= deployLogs[process.name] ? deployLogs[process.name] : 'No logs yet' %>
                     </td>
                 </tr>
             <% }); %>
         </tbody>
     </table>
+    <br>
+    <a href="/logout">Logout</a>
 </body>
 </html>

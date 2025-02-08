@@ -113,7 +113,6 @@ app.get('/', async (req, res) => {
         });
         // res.render('index', { processList });
         res.render('index', { processList });
-        // res.json(dummyData);
     });
 });
 
@@ -159,7 +158,7 @@ app.get('/ssl-status', async (req, res) => {
 });
 
 const appConfig = {
-    "simpuskes.com" : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
+    "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
     "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
     "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" }
 };
@@ -170,7 +169,9 @@ app.post('/deploy/:appName', async (req, res) => {
 
     if (!config) {
         deployLogs[appName] = `Deploy Failed: App config not found`;
-        return res.redirect('/');
+        // return res.redirect('/');
+        return res.render('index', { deployLogs });
+
     }
 
     deployLogs[appName] = 'Deploying...';
@@ -183,12 +184,16 @@ app.post('/deploy/:appName', async (req, res) => {
             } else {
                 deployLogs[appName] = `Deploy Success: ${stdout}`;
             }
-            res.redirect('/');
-        });
+            // res.redirect('/');
+            res.render('index', { deployLogs });
 
+        });
+        
     } catch (error) {
         deployLogs[appName] = `Deploy Failed: ${error.message}`;
-        res.redirect('/');
+        // res.redirect('/');
+        res.render('index', { deployLogs });
+
     }
 });
 
