@@ -174,27 +174,39 @@ app.post('/deploy/:appName', async (req, res) => {
 
     }
 
-    deployLogs[appName] = 'Deploying...';
+    deployLogs[appName] = 'Starting deployment...';
 
     try {
-        exec(`cd ${config.path} && git pull origin ${config.branch} && npm install && npm run build && pm2 restart ${appName}`, 
-        (error, stdout, stderr) => {
-            if (error || stderr) {
-                deployLogs[appName] = `Deploy Failed: ${error || stderr}`;
-            } else {
-                deployLogs[appName] = `Deploy Success: ${stdout}`;
-            }
-            // res.redirect('/');
-            res.render('index', { deployLogs });
+       // 1. Git Pull
+        deployLogs[appName] = 'Pulling latest code...';
+        const gitResult = await executeCommand(`git pull origin ${config.branch}`, config.path);
+        if (!gitResult.success) throw new Error(`Git Pull Failed: ${gitResult.message}`);
+        
+        // 2. NPM Install
+        deployLogs[appName] = 'Installing dependencies...';
+        const npmInstallResult = await executeCommand(`npm install`, config.path);
+        if (!npmInstallResult.success) throw new Error(`NPM Install Failed: ${npmInstallResult.message}`);
+        
+        // 3. NPM Build
+        deployLogs[appName] = 'Building application...';
+        const npmBuildResult = await executeCommand(`npm run build`, config.path);
+        if (!npmBuildResult.success) throw new Error(`Build Failed: ${npmBuildResult.message}`);
 
-        });
+        // 4. PM2 Restart
+        deployLogs[appName] = 'Restarting application...';
+        const pm2RestartResult = await executeCommand(`pm2 restart ${appName}`, config.path);
+        if (!pm2RestartResult.success) throw new Error(`PM2 Restart Failed: ${pm2RestartResult.message}`);
+
+        deployLogs[appName] = 'Deploy Success ✅';
         
     } catch (error) {
-        deployLogs[appName] = `Deploy Failed: ${error.message}`;
+        deployLogs[appName] = `Deploy Failed ❌: ${error.message}`;
         // res.redirect('/');
         res.render('index', { deployLogs });
 
     }
+
+    res.redirect('/');
 });
 
 
