@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 3023;
 const moment = require('moment-timezone');
-const processList = require('./dummy_data.json')
+// const processList = require('./dummy_data.json')
 const dataDomain    = require('./dataset/data_domain.json')
 const sslChecker = require('ssl-checker');
 let deployLogs = {};
@@ -173,7 +173,14 @@ function executeCommand(command, cwd) {
 const appConfig = {
     "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
     "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
-    "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" }
+    "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" },
+    "kartadewa.simpuskes.com"       : { path: "/home/simpuskes-kartadewa/htdocs/kartadewa.simpuskes.com", branch: "simpus-kertadewa" },
+    "simpangbabat.simpuskes.com"       : { path: "/home/simpuskes-simpangbabat/htdocs/simpangbabat.simpuskes.com", branch: "simpus-simpangbabat" },
+    "sungaibaung.simpuskes.com"       : { path: "/home/simpuskes-sungaibaung/htdocs/sungaibaung.simpuskes.com", branch: "simpus-sungaibaung" },
+    "talangubi.simpuskes.com"       : { path: "/home/simpuskes-talangubi/htdocs/talangubi.simpuskes.com", branch: "simpus-talangubi" },
+    "tanahabang.simpuskes.com"       : { path: "/home/simpuskes-tanahabang/htdocs/tanahabang.simpuskes.com", branch: "simpus-tanahabang" },
+    "tanjungbaru.simpuskes.com"       : { path: "/home/simpuskes-tanjungbaru/htdocs/tanjungbaru.simpuskes.com", branch: "simpus-tanjungbaru" },
+    "tempirai.simpuskes.com"       : { path: "/home/simpuskes-tempirai/htdocs/tempirai.simpuskes.com", branch: "simpus-tempirai" }
 };
 
 app.post('/deploy/:appName', async (req, res) => {
