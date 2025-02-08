@@ -112,7 +112,7 @@ app.get('/', async (req, res) => {
             };
         });
         // res.render('index', { processList });
-        res.render('index', { processList });
+        res.render('index', { processList, deployLogs });
     });
 });
 
@@ -170,8 +170,7 @@ app.post('/deploy/:appName', async (req, res) => {
     if (!config) {
         deployLogs[appName] = `Deploy Failed: App config not found`;
         // return res.redirect('/');
-        return res.render('index', { deployLogs });
-
+        return res.render('index', { processList, deployLogs });
     }
 
     deployLogs[appName] = 'Starting deployment...';
@@ -202,11 +201,9 @@ app.post('/deploy/:appName', async (req, res) => {
     } catch (error) {
         deployLogs[appName] = `Deploy Failed ❌: ${error.message}`;
         // res.redirect('/');
-        res.render('index', { deployLogs });
-
     }
 
-    res.redirect('/');
+    res.render('index', { processList, deployLogs });
 });
 
 

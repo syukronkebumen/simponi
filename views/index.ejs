@@ -46,7 +46,7 @@
                         </form>
                     </td>
                     <td>
-                        <%= deployLogs[process.name] ? deployLogs[process.name] : 'No logs yet' %>
+                        <pre><%= deployLogs[process.name] ? deployLogs[process.name] : 'No logs yet' %></pre>
                     </td>
                 </tr>
             <% }); %>
