@@ -63,10 +63,10 @@
     <a href="/logout">Logout</a>
 
     <!-- <script src="/socket.io/socket.io.js"></script> -->
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"></script>
     <script>
         var socket = io();
-        console.log('wkkw', socket)
+        // console.log('wkkw', socket)
         console.log(io())
 
         socket.on('deploy-status', function(data) {

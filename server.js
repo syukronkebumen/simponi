@@ -15,7 +15,6 @@ const socketIo = require('socket.io');
 
 const server = http.createServer(app);
 const io = socketIo(server);
-
 let deployLogs = {};
 // Fungsi untuk memeriksa status SSL domain
 async function checkSSL(domain) {
@@ -177,16 +176,16 @@ function executeCommand(command, cwd) {
 }
 
 const appConfig = {
-    // "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
-    // "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
-    // "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" },
-    // "kartadewa.simpuskes.com"     : { path: "/home/simpuskes-kartadewa/htdocs/kartadewa.simpuskes.com", branch: "simpus-kertadewa" },
-    // "simpangbabat.simpuskes.com"  : { path: "/home/simpuskes-simpangbabat/htdocs/simpangbabat.simpuskes.com", branch: "simpus-simpangbabat" },
-    // "sungaibaung.simpuskes.com"   : { path: "/home/simpuskes-sungaibaung/htdocs/sungaibaung.simpuskes.com", branch: "simpus-sungaibaung" },
-    // "talangubi.simpuskes.com"     : { path: "/home/simpuskes-talangubi/htdocs/talangubi.simpuskes.com", branch: "simpus-talangubi" },
-    // "tanahabang.simpuskes.com"    : { path: "/home/simpuskes-tanahabang/htdocs/tanahabang.simpuskes.com", branch: "simpus-tanahabang" },
-    // "tanjungbaru.simpuskes.com"   : { path: "/home/simpuskes-tanjungbaru/htdocs/tanjungbaru.simpuskes.com", branch: "simpus-tanjungbaru" },
-    // "tempirai.simpuskes.com"      : { path: "/home/simpuskes-tempirai/htdocs/tempirai.simpuskes.com", branch: "simpus-tempirai" },
+    "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
+    "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
+    "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" },
+    "kartadewa.simpuskes.com"     : { path: "/home/simpuskes-kartadewa/htdocs/kartadewa.simpuskes.com", branch: "simpus-kertadewa" },
+    "simpangbabat.simpuskes.com"  : { path: "/home/simpuskes-simpangbabat/htdocs/simpangbabat.simpuskes.com", branch: "simpus-simpangbabat" },
+    "sungaibaung.simpuskes.com"   : { path: "/home/simpuskes-sungaibaung/htdocs/sungaibaung.simpuskes.com", branch: "simpus-sungaibaung" },
+    "talangubi.simpuskes.com"     : { path: "/home/simpuskes-talangubi/htdocs/talangubi.simpuskes.com", branch: "simpus-talangubi" },
+    "tanahabang.simpuskes.com"    : { path: "/home/simpuskes-tanahabang/htdocs/tanahabang.simpuskes.com", branch: "simpus-tanahabang" },
+    "tanjungbaru.simpuskes.com"   : { path: "/home/simpuskes-tanjungbaru/htdocs/tanjungbaru.simpuskes.com", branch: "simpus-tanjungbaru" },
+    "tempirai.simpuskes.com"      : { path: "/home/simpuskes-tempirai/htdocs/tempirai.simpuskes.com", branch: "simpus-tempirai" },
     "skp.simpuskes.com"           : { path: "/home/simpuskes-skp/htdocs/skp.simpuskes.com", branch: "dev" }
 };
 
@@ -235,13 +234,14 @@ app.post('/deploy/:appName', async (req, res) => {
 
 // Saat client terhubung ke WebSocket
 io.on('connection', (socket) => {
-    console.log('Client connected');
+    console.log('Client connected', socket);
 });
 
 app.post('/deploy-all', async (req, res) => {
     io.emit('deploy-status', { message: "Starting deployment for all applications..." });
 
     for (const appName in appConfig) {
+        console.log('masukk')
         try {
             const config = appConfig[appName];
             if (!config) {
