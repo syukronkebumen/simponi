@@ -10,6 +10,12 @@ const moment = require('moment-timezone');
 const processList = require('./dummy_data.json')
 const dataDomain    = require('./dataset/data_domain.json')
 const sslChecker = require('ssl-checker');
+const http = require('http');
+const socketIo = require('socket.io');
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
 let deployLogs = {};
 // Fungsi untuk memeriksa status SSL domain
 async function checkSSL(domain) {
@@ -171,17 +177,17 @@ function executeCommand(command, cwd) {
 }
 
 const appConfig = {
-    "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
-    "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
-    "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" },
-    "kartadewa.simpuskes.com"     : { path: "/home/simpuskes-kartadewa/htdocs/kartadewa.simpuskes.com", branch: "simpus-kertadewa" },
-    "simpangbabat.simpuskes.com"  : { path: "/home/simpuskes-simpangbabat/htdocs/simpangbabat.simpuskes.com", branch: "simpus-simpangbabat" },
-    "sungaibaung.simpuskes.com"   : { path: "/home/simpuskes-sungaibaung/htdocs/sungaibaung.simpuskes.com", branch: "simpus-sungaibaung" },
-    "talangubi.simpuskes.com"     : { path: "/home/simpuskes-talangubi/htdocs/talangubi.simpuskes.com", branch: "simpus-talangubi" },
-    "tanahabang.simpuskes.com"    : { path: "/home/simpuskes-tanahabang/htdocs/tanahabang.simpuskes.com", branch: "simpus-tanahabang" },
-    "tanjungbaru.simpuskes.com"   : { path: "/home/simpuskes-tanjungbaru/htdocs/tanjungbaru.simpuskes.com", branch: "simpus-tanjungbaru" },
-    "tempirai.simpuskes.com"      : { path: "/home/simpuskes-tempirai/htdocs/tempirai.simpuskes.com", branch: "simpus-tempirai" },
-    "skp.simpuskes.com"           : { path: "/home/simpuskes-skp/htdocs/skp.simpuskes.com", branch: "simpus-skp" }
+    // "simpuskes.com"               : { path: "/home/simpuskes/htdocs/simpuskes.com", branch: "main" },
+    // "abab.simpuskes.com"          : { path: "/home/simpuskes-abab/htdocs/abab.simpuskes.com", branch: "simpus-abab" },
+    // "airitam.simpuskes.com"       : { path: "/home/simpuskes-airitam/htdocs/airitam.simpuskes.com", branch: "simpus-airitam" },
+    // "kartadewa.simpuskes.com"     : { path: "/home/simpuskes-kartadewa/htdocs/kartadewa.simpuskes.com", branch: "simpus-kertadewa" },
+    // "simpangbabat.simpuskes.com"  : { path: "/home/simpuskes-simpangbabat/htdocs/simpangbabat.simpuskes.com", branch: "simpus-simpangbabat" },
+    // "sungaibaung.simpuskes.com"   : { path: "/home/simpuskes-sungaibaung/htdocs/sungaibaung.simpuskes.com", branch: "simpus-sungaibaung" },
+    // "talangubi.simpuskes.com"     : { path: "/home/simpuskes-talangubi/htdocs/talangubi.simpuskes.com", branch: "simpus-talangubi" },
+    // "tanahabang.simpuskes.com"    : { path: "/home/simpuskes-tanahabang/htdocs/tanahabang.simpuskes.com", branch: "simpus-tanahabang" },
+    // "tanjungbaru.simpuskes.com"   : { path: "/home/simpuskes-tanjungbaru/htdocs/tanjungbaru.simpuskes.com", branch: "simpus-tanjungbaru" },
+    // "tempirai.simpuskes.com"      : { path: "/home/simpuskes-tempirai/htdocs/tempirai.simpuskes.com", branch: "simpus-tempirai" },
+    "skp.simpuskes.com"           : { path: "/home/simpuskes-skp/htdocs/skp.simpuskes.com", branch: "dev" }
 };
 
 app.post('/deploy/:appName', async (req, res) => {
@@ -227,6 +233,48 @@ app.post('/deploy/:appName', async (req, res) => {
     res.render('index', { processList, deployLogs });
 });
 
+// Saat client terhubung ke WebSocket
+io.on('connection', (socket) => {
+    console.log('Client connected');
+});
+
+app.post('/deploy-all', async (req, res) => {
+    io.emit('deploy-status', { message: "Starting deployment for all applications..." });
+
+    for (const appName in appConfig) {
+        try {
+            const config = appConfig[appName];
+            if (!config) {
+                io.emit('deploy-status', { appName, message: "Deploy Failed: App config not found" });
+                continue;
+            }
+
+            io.emit('deploy-status', { appName, message: "Pulling latest code..." });
+            const gitResult = await executeCommand(`git pull origin ${config.branch}`, config.path);
+            if (!gitResult.success) throw new Error(`Git Pull Failed: ${gitResult.message}`);
+
+            io.emit('deploy-status', { appName, message: "Installing dependencies..." });
+            const npmInstallResult = await executeCommand(`npm install`, config.path);
+            if (!npmInstallResult.success) throw new Error(`NPM Install Failed: ${npmInstallResult.message}`);
+
+            io.emit('deploy-status', { appName, message: "Building application..." });
+            const npmBuildResult = await executeCommand(`npm run build`, config.path);
+            if (!npmBuildResult.success) throw new Error(`Build Failed: ${npmBuildResult.message}`);
+
+            io.emit('deploy-status', { appName, message: "Restarting application..." });
+            const pm2RestartResult = await executeCommand(`pm2 restart ${appName}`, config.path);
+            if (!pm2RestartResult.success) throw new Error(`PM2 Restart Failed: ${pm2RestartResult.message}`);
+
+            io.emit('deploy-status', { appName, message: "Deploy Success ✅" });
+
+        } catch (error) {
+            io.emit('deploy-status', { appName, message: `Deploy Failed ❌: ${error.message}` });
+        }
+    }
+
+    io.emit('deploy-status', { message: "All applications deployed!" });
+    res.json({ message: "Deployment started, check status in UI." });
+});
 
 // Start server
 app.listen(port, () => {

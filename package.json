@@ -17,6 +17,7 @@
     "express-session": "^1.18.1",
     "moment-timezone": "^0.5.46",
     "pm2": "^5.4.3",
+    "socket.io": "^4.8.1",
     "ssl-checker": "^2.0.10"
   }
 }
