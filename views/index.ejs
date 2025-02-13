@@ -61,16 +61,21 @@
     </table>
     <br>
     <a href="/logout">Logout</a>
+
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+        console.log('wkkw', socket)
+        console.log(io())
+
+        socket.on('deploy-status', function(data) {
+            var logElement = document.getElementById('deployLogs');
+            logElement.innerHTML += `<p>${data.appName ? data.appName + ": " : ""}${data.message}</p>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        });
+    </script>
 </body>
 </html>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
 
-    socket.on('deploy-status', function(data) {
-        var logElement = document.getElementById('deployLogs');
-        logElement.innerHTML += `<p>${data.appName ? data.appName + ": " : ""}${data.message}</p>`;
-        logElement.scrollTop = logElement.scrollHeight;
-    });
-</script>
